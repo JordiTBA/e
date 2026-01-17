@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Akun Utama",
+    "package": "com.asepv2.mobu",
+    "link": "roblox://placeId=121864768012064&linkCode=LINK_CODE_AKUN_1"
+  },
+  {
+    "name": "Akun Tumbal 1",
+    "package": "com.roblox.client",
+    "link": "roblox://placeId=121864768012064&linkCode=LINK_CODE_AKUN_2"
+  },
+  {
+    "name": "Akun Clone",
+    "package": "com.another.mod.package",
+    "link": "roblox://placeId=121864768012064&linkCode=LINK_CODE_AKUN_3"
+  }
+]
