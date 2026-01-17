@@ -1,26 +1,35 @@
-# Cari lokasi su otomatis
+#!/bin/bash
+
+
+CONFIG_FILE="config.json"
 SU_CMD=$(which su)
 
+
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "Error: $CONFIG_FILE tidak ditemukan!"
+    exit 1
+fi
+
+echo "Mulai monitoring multi-instance..."
+
 while true; do
-    TIMESTAMP=$(date '+%H:%M:%S')
-    
-    # PERUBAHAN DI SINI:
-    # 1. Ganti 'dumpsys window windows' jadi 'dumpsys activity activities'
-    # 2. Ganti grep 'mCurrentFocus' jadi 'mResumedActivity'
-    # Ini bakal mendeteksi app walaupun di mode Freeform/Floating
-    if "$SU_CMD" -c "dumpsys activity activities" | grep -i 'mResumedActivity' | grep -q 'com.asepv2.mobu'; then
-        echo "[$TIMESTAMP] OK: Roblox (Mobu) aktif (Freeform/Fullscreen)."
-    else
-        echo "[$TIMESTAMP] ACTION: Roblox tidak terdeteksi. Melakukan auto-join..."
-        
-        # Kill app
-        "$SU_CMD" -c "am force-stop com.asepv2.mobu"
-        
-        # Start app (tetap pakai -p biar aman)
-        "$SU_CMD" -c "am start --user 0 -a android.intent.action.VIEW -p com.asepv2.mobu -d 'roblox://placeId=121864768012064&linkCode=29945061429931940452490641554963'"
-        
-        # Waktu tunggu loading (sesuaikan kalau HP lambat)
-        sleep 20
-    fi
+    for row in $(jq -r '.[] | @base64' "$CONFIG_FILE"); do
+        _jq() {
+         echo ${row} | base64 -d | jq -r ${1}
+        }
+        NAME=$(_jq '.name')
+        PKG=$(_jq '.package')
+        LINK_URL=$(_jq '.link')
+        TIMESTAMP=$(date '+%H:%M:%S')
+        if "$SU_CMD" -c "dumpsys activity activities" | grep -i 'mResumedActivity' | grep -q "$PKG"; then
+            echo "[$TIMESTAMP] OK: $NAME ($PKG) sedang aktif."
+        else
+            echo "[$TIMESTAMP] ACTION: $NAME mati/tertutup. Restarting..."
+            "$SU_CMD" -c "am force-stop $PKG"
+            "$SU_CMD" -c "am start --user 0 -a android.intent.action.VIEW -p $PKG -d '$LINK_URL'"
+            echo "[$TIMESTAMP] INFO: $NAME telah dijalankan ulang."
+            sleep 10
+        fi
+    done
     sleep 5
 done
