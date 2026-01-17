@@ -1,22 +1,25 @@
-# Cari lokasi su otomatis (Best Practice)
+# Cari lokasi su otomatis
 SU_CMD=$(which su)
 
 while true; do
     TIMESTAMP=$(date '+%H:%M:%S')
     
-    # 1. Cek apakah Mod Roblox (Mobu) ada di layar
-    if "$SU_CMD" -c "dumpsys window windows" | grep -i 'mCurrentFocus' | grep -q 'com.asepv2.mobu'; then
-        echo "[$TIMESTAMP] OK: Roblox (Mobu) sedang dimainkan."
+    # PERUBAHAN DI SINI:
+    # 1. Ganti 'dumpsys window windows' jadi 'dumpsys activity activities'
+    # 2. Ganti grep 'mCurrentFocus' jadi 'mResumedActivity'
+    # Ini bakal mendeteksi app walaupun di mode Freeform/Floating
+    if "$SU_CMD" -c "dumpsys activity activities" | grep -i 'mResumedActivity' | grep -q 'com.asepv2.mobu'; then
+        echo "[$TIMESTAMP] OK: Roblox (Mobu) aktif (Freeform/Fullscreen)."
     else
-        echo "[$TIMESTAMP] ACTION: Roblox tidak di layar. Melakukan auto-join..."
+        echo "[$TIMESTAMP] ACTION: Roblox tidak terdeteksi. Melakukan auto-join..."
         
-        # 2. Kill paksa aplikasi Mod
+        # Kill app
         "$SU_CMD" -c "am force-stop com.asepv2.mobu"
         
-        # 3. Start aplikasi Mod dengan target spesifik (-p)
-        # Kita tambah '-p com.asepv2.mobu' biar sistem gak bingung
+        # Start app (tetap pakai -p biar aman)
         "$SU_CMD" -c "am start --user 0 -a android.intent.action.VIEW -p com.asepv2.mobu -d 'roblox://placeId=121864768012064&linkCode=29945061429931940452490641554963'"
         
+        # Waktu tunggu loading (sesuaikan kalau HP lambat)
         sleep 20
     fi
     sleep 5
