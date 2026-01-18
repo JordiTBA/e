@@ -25,6 +25,7 @@ while true; do
         
         TIMESTAMP=$(date '+%H:%M:%S')
         if "$SU_CMD" -c "pidof $PKG" > /dev/null; then
+        echo"aA"
         else
             echo "[$TIMESTAMP] ACTION: $NAME mati/crash. Membuka di posisi: $BOUNDS"
             "$SU_CMD" -c "am force-stop $PKG"
