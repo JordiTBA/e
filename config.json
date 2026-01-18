@@ -1,7 +1,8 @@
 [
   {
-    "name": "Akun Utama",
+    "name": "Akun 1 (Kiri Atas)",
     "package": "com.asepv2.mobu",
-    "link": "roblox://placeId=121864768012064"
+    "link": "roblox://placeId=121864768012064",
+    "bounds": "0,0,540,1200"
   }
 ]
