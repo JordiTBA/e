@@ -24,8 +24,9 @@ while true; do
         BOUNDS=$(_jq '.bounds')
         
         TIMESTAMP=$(date '+%H:%M:%S')
-        if "$SU_CMD" -c "pidof $PKG" > /dev/null; then
-            echo "aA"
+        if "$SU_CMD" -c "dumpsys activity activities" | grep -i 'mResumedActivity' | grep -q "$PKG"; then
+            echo "[$TIMESTAMP] INFO: $NAME sedang berjalan. Melewati..."
+            
         else
             echo "[$TIMESTAMP] ACTION: $NAME mati/crash. Membuka di posisi: $BOUNDS"
             "$SU_CMD" -c "am force-stop $PKG"
